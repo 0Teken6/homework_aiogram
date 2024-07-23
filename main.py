@@ -1,13 +1,16 @@
 from config import dp, Admins, bot
 from aiogram.utils import executor
 import logging
-from handlers import commands, echo, quiz, FSM_market
+from handlers import commands, echo, quiz, FSM_market, products_commands, admin_commands
 import buttons
+from db import main_db
 
 
 async def on_startup(_):
     for id in Admins:
+        await admin_commands.set_scheduler()
         await bot.send_message(chat_id=id, text='Bot started', reply_markup=buttons.start_buttons)
+        await main_db.sql_create()
 
 
 async def on_shutdown(_):
@@ -16,7 +19,8 @@ async def on_shutdown(_):
 
 commands.register_commands(dp)
 quiz.register_quiz(dp)
-FSM_market.register_fsm_for_prod(dp)
+FSM_market.register_fsm_prod(dp)
+products_commands.register_products_commands(dp)
 echo.register_echo(dp)
 
 if __name__ == "__main__":
