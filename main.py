@@ -1,7 +1,7 @@
 from config import dp, Admins, bot
 from aiogram.utils import executor
 import logging
-from handlers import commands, echo, quiz, FSM_market, products_commands, admin_commands
+from handlers import commands, echo, quiz, FSM_market, products_commands, admin_commands, webapp, admin_group
 import buttons
 from db import main_db
 
@@ -21,7 +21,9 @@ commands.register_commands(dp)
 quiz.register_quiz(dp)
 FSM_market.register_fsm_prod(dp)
 products_commands.register_products_commands(dp)
-echo.register_echo(dp)
+webapp.register_webapp(dp)
+admin_group.register_admin_group(dp)
+# echo.register_echo(dp)
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
