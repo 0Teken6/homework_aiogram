@@ -15,6 +15,7 @@ class RegisterProduct(StatesGroup):
     price = State()
     productid = State()
     infoproduct = State()
+    collection = State()
     photo = State()
     submit = State()
 
@@ -57,6 +58,11 @@ async def load_price(message: types.Message, state: FSMContext):
 
 
 async def load_productid(message: types.Message, state: FSMContext):
+    products = await main_db.sql_get_products()
+    for product in products:
+        if message.text == product[3]:
+            await message.answer(text='The product id is already used! Write another one:')
+            return
     async with state.proxy() as data:
         data['productid'] = message.text
 
@@ -67,6 +73,14 @@ async def load_productid(message: types.Message, state: FSMContext):
 async def load_infoproduct(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['infoproduct'] = message.text
+
+    await RegisterProduct.next()
+    await message.answer(text='Write collection:')
+
+
+async def load_collection(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['collection'] = message.text
 
     await RegisterProduct.next()
     kb = types.ReplyKeyboardRemove()
@@ -87,7 +101,8 @@ async def load_photo(message: types.Message, state: FSMContext):
                                        f'Category: {data["category"]}\n'
                                        f'Price: {data["price"]}\n'
                                        f'Product ID: {data["productid"]}\n'
-                                       f'Product Info: {data["infoproduct"]}\n\n'
+                                       f'Product Info: {data["infoproduct"]}\n'
+                                       f'Collection: {data["collection"]}\n\n'
                                        f'<b>Is it correct?</b>',
                                reply_markup=keyboard, parse_mode=types.ParseMode.HTML)
 
@@ -107,12 +122,15 @@ async def submit(message: types.Message, state: FSMContext):
                 category=data['category'],
                 infoproduct=data['infoproduct']
             )
+            await main_db.sql_insert_product_collection(
+                productid=data['productid'],
+                collection=data['collection'],
+            )
             await message.answer('Data is saved!', reply_markup=buttons.start_buttons)
             await state.finish()
     elif message.text == 'No':
         await message.answer('Canceled!', reply_markup=buttons.start_buttons)
         await state.finish()
-
     else:
         await message.answer(text='Tap on a button!')
 
@@ -134,5 +152,6 @@ def register_fsm_prod(dp: Dispatcher):
     dp.register_message_handler(load_category, state=RegisterProduct.category)
     dp.register_message_handler(load_productid, state=RegisterProduct.productid)
     dp.register_message_handler(load_infoproduct, state=RegisterProduct.infoproduct)
+    dp.register_message_handler(load_collection, state=RegisterProduct.collection)
     dp.register_message_handler(load_photo, state=RegisterProduct.photo, content_types=['photo'])
     dp.register_message_handler(submit, state=RegisterProduct.submit)

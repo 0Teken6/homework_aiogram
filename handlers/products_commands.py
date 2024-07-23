@@ -9,13 +9,14 @@ async def show_products(message: types.Message):
     products = await main_db.sql_get_products()
     if products:
         for product in products:
-            await message.answer_photo(photo=product[5],
-                                       caption=f'Name: {product[1]}\n'
-                                               f'Size: {product[2]}\n'
-                                               f'Category: {product[-2]}\n'
-                                               f'Price: {product[3]}\n'
-                                               f'Product ID: {product[4]}\n'
-                                               f'Product Info: {product[-1]}\n')
+            await message.answer_photo(photo=product[4],
+                                       caption=f'Name: {product[0]}\n'
+                                               f'Size: {product[1]}\n'
+                                               f'Category: {product[5]}\n'
+                                               f'Price: {product[2]}\n'
+                                               f'Product ID: {product[3]}\n'
+                                               f'Product Info: {product[6]}\n'
+                                               f'Collection: {product[7]}\n')
     else:
         await message.answer(text='There is no products!')
 
@@ -28,13 +29,15 @@ async def show_product_by_id(message: types.Message, id=None):
     keyboard = InlineKeyboardMarkup()
     next_buttons = InlineKeyboardButton('Next', callback_data=f'next_{id+1}')
     keyboard.add(next_buttons)
-    await message.answer_photo(photo=product[5],
-                               caption=f'Name: {product[1]}\n'
-                                       f'Size: {product[2]}\n'
-                                       f'Category: {product[-2]}\n'
-                                       f'Price: {product[3]}\n'
-                                       f'Product ID: {product[4]}\n'
-                                       f'Product Info: {product[-1]}\n', reply_markup=keyboard)
+    await message.answer_photo(photo=product[4],
+                               caption=f'Name: {product[0]}\n'
+                                       f'Size: {product[1]}\n'
+                                       f'Category: {product[5]}\n'
+                                       f'Price: {product[2]}\n'
+                                       f'Product ID: {product[3]}\n'
+                                       f'Product Info: {product[6]}\n'
+                                       f'Collection: {product[7]}\n',
+                               reply_markup=keyboard)
 
 
 async def show_next_product(callback_query: types.CallbackQuery):

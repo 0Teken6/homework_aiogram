@@ -9,6 +9,7 @@ async def sql_create():
     if db:
         cursor.execute(queries.CREATE_TABLE_STORE)
         cursor.execute(queries.CREATE_TABLE_PRODUCT_DETAILS)
+        cursor.execute(queries.CREATE_TABLE_PRODUCT_COLLECTION)
     db.commit()
 
 
@@ -27,6 +28,13 @@ async def sql_insert_detail_product(productid, category, infoproduct):
         productid,
         category,
         infoproduct))
+    db.commit()
+
+
+async def sql_insert_product_collection(productid, collection):
+    cursor.execute(queries.INSERT_PRODUCT_COLLECTION, (
+        productid,
+        collection))
     db.commit()
 
 
